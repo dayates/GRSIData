@@ -32,7 +32,7 @@ find_package(Git REQUIRED)
 #----------------------------------------------------------------------------
 # find the root package (and add COMPONENTS)
 #find_package(ROOT REQUIRED COMPONENTS Gui GuiHtml Minuit Spectrum)
-find_package(ROOT REQUIRED XMLParser)
+find_package(ROOT OPTIONAL_COMPONENTS XMLParser)
 
 if(${ROOT_xml_FOUND})
 	add_compile_options(-DHAS_XML)
@@ -90,7 +90,7 @@ add_library(TGRSIFormat SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TCSM/TCSMHit.cxx
 	)
 root_generate_dictionary(G__TGRSIFormat TGRSIDetectorInformation.h TGRSIMnemonic.h TCSM.h TCSMHit.h MODULE TGRSIFormat LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIFormat/CMakeLinkDef.h)
-target_link_libraries(TGRSIFormat TDescant TEmma TGenericDetector TGriffin TLaBr TPaces TRcmp TRF TS3 TSceptar TSharc TSharc2 TSiLi TTAC TTigress TTip TTrific TTriFoil TZeroDegree)
+target_link_libraries(TGRSIFormat TAries TDescant TDemand TEmma TGenericDetector TGriffin TLaBr TPaces TRcmp TRF TS3 TSceptar TSharc TSharc2 TSiLi TTAC TTigress TTip TTrific TTriFoil TZeroDegree)
 
 add_library(TGRSIDataParser SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIDataParser/TGRSIDataParser.cxx
@@ -104,12 +104,26 @@ add_library(TAngularCorrelation SHARED
 root_generate_dictionary(G__TAngularCorrelation TAngularCorrelation.h MODULE TAngularCorrelation LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TAngularCorrelation/LinkDef.h)
 target_link_libraries(TAngularCorrelation TGriffin)
 
+add_library(TAries SHARED
+	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TAries/TAries.cxx
+	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TAries/TAriesHit.cxx
+	)
+root_generate_dictionary(G__TAries TAries.h TAriesHit.h MODULE TAries LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TAries/LinkDef.h)
+target_link_libraries(TAries ${GRSI_LIBRARIES})
+
 add_library(TDescant SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TDescant/TDescant.cxx
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TDescant/TDescantHit.cxx
 	)
 root_generate_dictionary(G__TDescant TDescant.h TDescantHit.h MODULE TDescant LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TDescant/LinkDef.h)
 target_link_libraries(TDescant ${GRSI_LIBRARIES})
+
+add_library(TDemand SHARED
+	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TDemand/TDemand.cxx
+	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TDemand/TDemandHit.cxx
+	)
+root_generate_dictionary(G__TDemand TDemand.h TDemandHit.h MODULE TDemand LINKDEF ${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TDemand/LinkDef.h)
+target_link_libraries(TDemand ${GRSI_LIBRARIES})
 
 add_library(TEmma SHARED
 	${PROJECT_SOURCE_DIR}/libraries/TGRSIAnalysis/TEmma/TEmma.cxx
@@ -246,7 +260,7 @@ target_link_libraries(MakeGriffinHistograms TDescant TGriffin TSceptar TZeroDegr
 
 ##----------------------------------------------------------------------------
 ## add all executable in util
-set(GRSIDATA_LIBRARIES TAngularCorrelation TDescant TEmma TGenericDetector TGriffin TGRSIDataParser TGRSIFormat TLaBr TMidas TPaces TRcmp TRF TS3 TSceptar TSharc TSharc2 TSiLi TTAC TTigress TTip TTrific TTriFoil TZeroDegree MakeGriffinHistograms)
+set(GRSIDATA_LIBRARIES TAngularCorrelation TAries TDescant TDemand TEmma TGenericDetector TGriffin TGRSIDataParser TGRSIFormat TLaBr TMidas TPaces TRcmp TRF TS3 TSceptar TSharc TSharc2 TSiLi TTAC TTigress TTip TTrific TTriFoil TZeroDegree MakeGriffinHistograms)
 set(UTIL_NAMES AngularCorrelations bufferclean Deadtime ExamineMidasFile FixRunInfo GainMatchGRIFFIN GetTreeEntries GriffinCTFix LeanComptonMatrices offsetadd offsetfind offsetfix tac_calibrator write_cal)
 foreach(UTIL IN LISTS UTIL_NAMES)
 	add_executable(${UTIL} ${PROJECT_SOURCE_DIR}/util/${UTIL}.cxx)
@@ -275,6 +289,6 @@ add_custom_target(GRSIDataVersion
 #----------------------------------------------------------------------------
 # create a compile_commands.json file which can be used for clang-tidy
 if(NOT DEFINED ENV{CMAKE_EXPORT_COMPILE_COMMANDS})
-    message("ENV(CMAKE_EXPORT_COMPILE_COMMANDS) NOT DEFINED")
-    set($ENV{CMAKE_EXPORT_COMPILE_COMMANDS} TRUE)
+	message("ENV(CMAKE_EXPORT_COMPILE_COMMANDS) NOT DEFINED, setting it to TRUE")
+	set($ENV{CMAKE_EXPORT_COMPILE_COMMANDS} TRUE)
 endif()
